@@ -1,0 +1,12 @@
+{
+  "name": "ymc-work-tracker",
+  "version": "1.0.0",
+  "description": "YMC & Associates Enterprise Work Tracker with Neon PostgreSQL",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve ."
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}
