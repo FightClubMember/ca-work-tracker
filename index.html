@@ -44,8 +44,10 @@ tr.od td:first-child{box-shadow:inset 3px 0 var(--bad)}
 .md h3{margin:0 0 12px}.md label{display:block;font-size:13px;color:var(--mut);margin:10px 0 3px}.md input,.md select{width:100%}
 .md .act{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;margin-right:4px}
-.chip-login{background:var(--card);border:1px solid var(--bd);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:12px}
+.chip-login{background:var(--card);border:1px solid var(--bd);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500}
 .chip-login:hover{border-color:var(--pri);color:var(--pri)}
+.chip-login.supreme{border-color:#b3261e;background:#fbe4e2;color:#b3261e;font-weight:700}
+.chip-login.super{border-color:#1f4e79;background:#e1ecf7;color:#1f4e79;font-weight:700}
 </style>
 </head>
 <body>
@@ -61,14 +63,26 @@ tr.od td:first-child{box-shadow:inset 3px 0 var(--bad)}
 <div id="m"></div>
 <script>
 const K = 'cafirm_v2';
+
+// Standard Pre-seeded users (with Ultra Admin 2006 & Super Admin ankit01)
+const MASTER_USERS = [
+  { id: 'usr_ultra', username: '2006', passPlain: '844127', passHash: 'cfe1a736330273dde04945e85da4a3da8530315928bb67ecc4ee017951e292cd', name: 'Ultra Admin (Supreme)', role: 'Ultra Admin' },
+  { id: 'usr_super_ankit', username: 'ankit01', passPlain: 'ankit@01', passHash: '9c0b45a01dd12953722e27685a8a480473ca2b960807242f9cc477c0659b174e', name: 'Ankit (Super Admin)', role: 'Super Admin' },
+  { id: 'usr_admin', username: 'admin', passPlain: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'CA Partner (Admin)', role: 'Admin' },
+  { id: 'usr_mgr', username: 'manager', passPlain: 'manager', passHash: 'e6c279e8a5b28a9b4009e53096b744d03d011f0088031e8460dd804dfa29910d', name: 'Sneha Patel (Manager)', role: 'Manager' },
+  { id: 'usr_staff1', username: 'rohit', passPlain: 'staff', passHash: 'f4f10714777559e2b146e25dc7d03df62ef58667b2d561d31cfc2df36294b41a', name: 'Rohit Sharma (Article)', role: 'Staff' }
+];
+
 let db = {
-  users: [
-    { id: 'usr_admin', username: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'CA Yash Mehta (Admin)', role: 'Admin' },
-    { id: 'usr_mgr', username: 'manager', passHash: 'e6c279e8a5b28a9b4009e53096b744d03d011f0088031e8460dd804dfa29910d', name: 'Sneha Patel (Manager)', role: 'Manager' },
-    { id: 'usr_staff1', username: 'rohit', passHash: 'f4f10714777559e2b146e25dc7d03df62ef58667b2d561d31cfc2df36294b41a', name: 'Rohit Sharma (Article)', role: 'Staff' }
-  ],
+  users: [...MASTER_USERS],
   clients: [],
-  emps: [],
+  emps: [
+    { id: 'usr_ultra', name: 'Ultra Admin (Supreme)', role: 'Ultra Admin' },
+    { id: 'usr_super_ankit', name: 'Ankit (Super Admin)', role: 'Super Admin' },
+    { id: 'usr_admin', name: 'CA Partner (Admin)', role: 'Admin' },
+    { id: 'usr_mgr', name: 'Sneha Patel (Manager)', role: 'Manager' },
+    { id: 'usr_staff1', name: 'Rohit Sharma (Article)', role: 'Staff' }
+  ],
   tasks: [],
   logs: []
 };
@@ -77,7 +91,16 @@ let currentUser = null;
 
 try {
   const s = localStorage.getItem(K);
-  if (s) db = Object.assign(db, JSON.parse(s));
+  if (s) {
+    const loaded = JSON.parse(s);
+    db = Object.assign(db, loaded);
+    // ensure Master users always present
+    for (const mu of MASTER_USERS) {
+      if (!db.users.find(u => u.username === mu.username)) {
+        db.users.push(mu);
+      }
+    }
+  }
   const u = sessionStorage.getItem(K + '_u');
   if (u) currentUser = JSON.parse(u);
 } catch(e) {}
@@ -101,9 +124,23 @@ async function syncWithNeon() {
     if (res.ok) {
       const data = await res.json();
       if (data.users && data.users.length) {
-        db.users = data.users.map(u => ({ id: u.id, username: u.username, passHash: u.password_hash, name: u.name, role: u.role }));
+        // Merge Neon users with local master users
+        const fetched = data.users.map(u => ({
+          id: u.id,
+          username: u.username,
+          passHash: u.password_hash,
+          name: u.name,
+          role: u.role
+        }));
+        
+        for (const mu of MASTER_USERS) {
+          if (!fetched.find(x => x.username === mu.username)) {
+            fetched.unshift(mu);
+          }
+        }
+        db.users = fetched;
         db.clients = data.clients;
-        db.emps = data.users.filter(u => u.role !== 'Client').map(u => ({ id: u.id, name: u.name, role: u.role }));
+        db.emps = db.users.filter(u => u.role !== 'Client').map(u => ({ id: u.id, name: u.name, role: u.role }));
         db.tasks = data.tasks;
         db.logs = data.logs;
         localStorage.setItem(K, JSON.stringify(db));
@@ -173,14 +210,39 @@ function needBase() {
   return false;
 }
 
-/* Authentication */
+/* Authentication logic supporting direct password and SHA-256 */
 async function login(un, pw) {
-  const hash = await sha256(pw);
-  const u = db.users.find(x => x.username.toLowerCase() === un.trim().toLowerCase() && (x.passHash === hash || x.password_hash === hash));
-  if (!u) {
-    alert('Invalid username or password');
+  const cleanUser = String(un).trim().toLowerCase();
+  const cleanPass = String(pw).trim();
+  const hash = await sha256(cleanPass);
+
+  // Check Ultra Admin (2006 / 844127)
+  if (cleanUser === '2006' && cleanPass === '844127') {
+    currentUser = { id: 'usr_ultra', username: '2006', name: 'Ultra Admin (Supreme)', role: 'Ultra Admin' };
+    sessionStorage.setItem(K + '_u', JSON.stringify(currentUser));
+    render();
     return;
   }
+
+  // Check Super Admin (ankit01 / ankit@01)
+  if (cleanUser === 'ankit01' && cleanPass === 'ankit@01') {
+    currentUser = { id: 'usr_super_ankit', username: 'ankit01', name: 'Ankit (Super Admin)', role: 'Super Admin' };
+    sessionStorage.setItem(K + '_u', JSON.stringify(currentUser));
+    render();
+    return;
+  }
+
+  // Check database users
+  const u = db.users.find(x => 
+    x.username.toLowerCase() === cleanUser && 
+    (x.passPlain === cleanPass || x.passHash === hash || x.password_hash === hash || x.password_hash === cleanPass)
+  );
+
+  if (!u) {
+    alert('Invalid username or password! Please check credentials or use the 1-click login buttons below.');
+    return;
+  }
+
   currentUser = u;
   sessionStorage.setItem(K + '_u', JSON.stringify(currentUser));
   render();
@@ -299,11 +361,11 @@ function userForm() {
   form('Create User ID & Password', [
     { k: 'username', l: 'Username / Login ID', r: 1 },
     { k: 'name', l: 'Display Name', r: 1 },
-    { k: 'role', l: 'Role', t: 'select', o: ['Staff', 'Manager', 'Admin'], def: 'Staff' },
+    { k: 'role', l: 'Role', t: 'select', o: ['Staff', 'Manager', 'Admin', 'Super Admin'], def: 'Staff' },
     { k: 'password', l: 'Password', r: 1 }
   ], null, async o => {
     const hash = await sha256(o.password);
-    const newU = { id: uid(), username: o.username.toLowerCase(), name: o.name, role: o.role, passHash: hash, password_hash: hash };
+    const newU = { id: uid(), username: o.username.toLowerCase(), name: o.name, role: o.role, passHash: hash, passPlain: o.password, password_hash: hash };
     db.users.push(newU);
     db.emps.push({ id: newU.id, name: newU.name, role: newU.role });
     save('insert', 'users', newU);
@@ -314,8 +376,13 @@ function userForm() {
 
 async function resetUserPass(id) {
   const u = db.users.find(x => x.id === id);
+  if (u.username === '2006' && currentUser.username !== '2006') {
+    alert('Ultra Admin credentials cannot be changed by other users.');
+    return;
+  }
   const p = prompt('Set new password for @' + u.username + ':');
   if (!p) return;
+  u.passPlain = p;
   u.passHash = await sha256(p);
   u.password_hash = u.passHash;
   save('insert', 'users', u);
@@ -324,6 +391,11 @@ async function resetUserPass(id) {
 }
 
 function del(k, id, msg) {
+  const target = (db[k] || []).find(x => x.id === id);
+  if (k === 'users' && target && (target.username === '2006' || target.role === 'Ultra Admin')) {
+    alert('Ultra Admin cannot be deleted!');
+    return;
+  }
   if (confirm(msg || 'Delete this record?')) {
     db[k] = db[k].filter(x => x.id !== id);
     if (k === 'clients') {
@@ -362,18 +434,21 @@ const V = {
       <h2 style="font-size:18px;margin-bottom:6px;">Sign In to CA Work Tracker</h2>
       <div class="mut" style="margin-bottom:18px;">Neon PostgreSQL Cloud Connected &bull; Multi-ID Login</div>
       <form onsubmit="event.preventDefault(); login(this.u.value, this.p.value);">
-        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Username</label>
-        <input style="width:100%;margin-bottom:12px;" type="text" name="u" placeholder="admin or rohit" required autofocus>
+        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Username / ID</label>
+        <input style="width:100%;margin-bottom:12px;" type="text" name="u" placeholder="e.g. 2006 or ankit01" required autofocus>
         <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Password</label>
         <input style="width:100%;margin-bottom:16px;" type="password" name="p" placeholder="••••••••" required>
-        <button class="btn" style="width:100%;" type="submit">Log In</button>
+        <button class="btn" style="width:100%;" type="submit">Sign In</button>
       </form>
       <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:14px;">
-        <span class="mut" style="font-size:12px;display:block;margin-bottom:6px;">Quick 1-Click Access:</span>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="chip-login" onclick="login('admin','admin')">👑 Admin (admin:admin)</button>
-          <button class="chip-login" onclick="login('manager','manager')">💼 Manager (manager:manager)</button>
-          <button class="chip-login" onclick="login('rohit','staff')">📝 Article (rohit:staff)</button>
+        <span class="mut" style="font-size:12px;display:block;margin-bottom:8px;">Instant 1-Click Access:</span>
+        <div style="display:flex;gap:6px;flex-direction:column;">
+          <button class="chip-login supreme" onclick="login('2006','844127')">⚡ Ultra Admin Supreme (ID: 2006 / Pass: 844127)</button>
+          <button class="chip-login super" onclick="login('ankit01','ankit@01')">⭐ Super Admin (ID: ankit01 / Pass: ankit@01)</button>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <button class="chip-login" style="flex:1" onclick="login('admin','admin')">👑 Admin (admin:admin)</button>
+            <button class="chip-login" style="flex:1" onclick="login('rohit','staff')">📝 Staff (rohit:staff)</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -428,7 +503,7 @@ const V = {
 
   team() {
     return `<div class="bar"><span class="sp"></span><button class="btn" onclick="empForm()">+ Add team member</button></div>
-    <div class="panel">${db.emps.length ? `<div class="tw"><table><tr><th>Name</th><th>Role</th><th>Pending</th><th>Total entries</th><th></th></tr>${db.emps.map(e => `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role || '')}</td><td>${db.tasks.filter(t => t.emp === e.id && t.status !== 'Completed').length}</td><td>${db.logs.filter(l => l.emp === e.id).length}</td><td><button class="btn d s" onclick="del('emps','${e.id}','Remove this team member?')">✕</button></td></tr>`).join('')}</table></div>` : '<div class="empty">Add the people who do the work.</div>'}</div>`;
+    <div class="panel">${db.emps.length ? `<div class="tw"><table><tr><th>Name</th><th>Role</th><th>Pending</th><th>Total entries</th><th></th></tr>${db.emps.map(e => `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role || '')}</td><td>${db.tasks.filter(t => t.emp === e.id && t.status !== 'Completed').length}</td><td>${db.logs.filter(l => l.emp === e.id).length}</td><td>${e.role !== 'Ultra Admin' ? `<button class="btn d s" onclick="del('emps','${e.id}','Remove this team member?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add the people who do the work.</div>'}</div>`;
   },
 
   users() {
@@ -437,7 +512,7 @@ const V = {
       <span class="sp"></span>
       <button class="btn" onclick="userForm()">+ Add User ID &amp; Password</button>
     </div>
-    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Admin' ? 'High' : 'Medium'}">${esc(u.role)}</span></td><td><span class="mut">Encrypted</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
+    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Ultra Admin' ? 'High' : (u.role === 'Super Admin' || u.role === 'Admin') ? 'Medium' : 'Low'}">${esc(u.role)}</span></td><td><span class="mut">${u.passPlain ? esc(u.passPlain) : 'Encrypted'}</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.role !== 'Ultra Admin' && u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
   }
 };
 
