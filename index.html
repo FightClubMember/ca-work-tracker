@@ -44,10 +44,6 @@ tr.od td:first-child{box-shadow:inset 3px 0 var(--bad)}
 .md h3{margin:0 0 12px}.md label{display:block;font-size:13px;color:var(--mut);margin:10px 0 3px}.md input,.md select{width:100%}
 .md .act{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;margin-right:4px}
-.chip-login{background:var(--card);border:1px solid var(--bd);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500}
-.chip-login:hover{border-color:var(--pri);color:var(--pri)}
-.chip-login.supreme{border-color:#b3261e;background:#fbe4e2;color:#b3261e;font-weight:700}
-.chip-login.super{border-color:#1f4e79;background:#e1ecf7;color:#1f4e79;font-weight:700}
 </style>
 </head>
 <body>
@@ -64,7 +60,7 @@ tr.od td:first-child{box-shadow:inset 3px 0 var(--bad)}
 <script>
 const K = 'cafirm_v2';
 
-// Standard Pre-seeded users (with Ultra Admin 2006 & Super Admin ankit01)
+// Master pre-configured IDs
 const MASTER_USERS = [
   { id: 'usr_ultra', username: '2006', passPlain: '844127', passHash: 'cfe1a736330273dde04945e85da4a3da8530315928bb67ecc4ee017951e292cd', name: 'Ultra Admin (Supreme)', role: 'Ultra Admin' },
   { id: 'usr_super_ankit', username: 'ankit01', passPlain: 'ankit@01', passHash: '9c0b45a01dd12953722e27685a8a480473ca2b960807242f9cc477c0659b174e', name: 'Ankit (Super Admin)', role: 'Super Admin' },
@@ -94,7 +90,6 @@ try {
   if (s) {
     const loaded = JSON.parse(s);
     db = Object.assign(db, loaded);
-    // ensure Master users always present
     for (const mu of MASTER_USERS) {
       if (!db.users.find(u => u.username === mu.username)) {
         db.users.push(mu);
@@ -124,7 +119,6 @@ async function syncWithNeon() {
     if (res.ok) {
       const data = await res.json();
       if (data.users && data.users.length) {
-        // Merge Neon users with local master users
         const fetched = data.users.map(u => ({
           id: u.id,
           username: u.username,
@@ -210,7 +204,7 @@ function needBase() {
   return false;
 }
 
-/* Authentication logic supporting direct password and SHA-256 */
+/* Secure Authentication logic */
 async function login(un, pw) {
   const cleanUser = String(un).trim().toLowerCase();
   const cleanPass = String(pw).trim();
@@ -239,7 +233,7 @@ async function login(un, pw) {
   );
 
   if (!u) {
-    alert('Invalid username or password! Please check credentials or use the 1-click login buttons below.');
+    alert('Invalid username or password!');
     return;
   }
 
@@ -362,7 +356,7 @@ function userForm() {
     { k: 'username', l: 'Username / Login ID', r: 1 },
     { k: 'name', l: 'Display Name', r: 1 },
     { k: 'role', l: 'Role', t: 'select', o: ['Staff', 'Manager', 'Admin', 'Super Admin'], def: 'Staff' },
-    { k: 'password', l: 'Password', r: 1 }
+    { k: 'password', l: 'Password', t: 'password', r: 1 }
   ], null, async o => {
     const hash = await sha256(o.password);
     const newU = { id: uid(), username: o.username.toLowerCase(), name: o.name, role: o.role, passHash: hash, passPlain: o.password, password_hash: hash };
@@ -430,27 +424,16 @@ function taskRows(list) {
 
 const V = {
   login() {
-    return `<div class="panel" style="max-width:440px;margin:50px auto;padding:24px;">
-      <h2 style="font-size:18px;margin-bottom:6px;">Sign In to CA Work Tracker</h2>
-      <div class="mut" style="margin-bottom:18px;">Neon PostgreSQL Cloud Connected &bull; Multi-ID Login</div>
+    return `<div class="panel" style="max-width:380px;margin:60px auto;padding:24px;">
+      <h2 style="font-size:18px;margin-bottom:6px;text-align:center;">Sign In</h2>
+      <div class="mut" style="margin-bottom:20px;text-align:center;font-size:13px;">CA Firm Management Portal</div>
       <form onsubmit="event.preventDefault(); login(this.u.value, this.p.value);">
-        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Username / ID</label>
-        <input style="width:100%;margin-bottom:12px;" type="text" name="u" placeholder="e.g. 2006 or ankit01" required autofocus>
-        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Password</label>
-        <input style="width:100%;margin-bottom:16px;" type="password" name="p" placeholder="••••••••" required>
-        <button class="btn" style="width:100%;" type="submit">Sign In</button>
+        <label class="mut" style="font-size:12px;display:block;margin-bottom:5px;">User ID</label>
+        <input style="width:100%;margin-bottom:14px;" type="text" name="u" placeholder="Enter your ID" autocomplete="username" required autofocus>
+        <label class="mut" style="font-size:12px;display:block;margin-bottom:5px;">Password</label>
+        <input style="width:100%;margin-bottom:18px;" type="password" name="p" placeholder="Enter password" autocomplete="current-password" required>
+        <button class="btn" style="width:100%;padding:10px;" type="submit">Sign In</button>
       </form>
-      <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:14px;">
-        <span class="mut" style="font-size:12px;display:block;margin-bottom:8px;">Instant 1-Click Access:</span>
-        <div style="display:flex;gap:6px;flex-direction:column;">
-          <button class="chip-login supreme" onclick="login('2006','844127')">⚡ Ultra Admin Supreme (ID: 2006 / Pass: 844127)</button>
-          <button class="chip-login super" onclick="login('ankit01','ankit@01')">⭐ Super Admin (ID: ankit01 / Pass: ankit@01)</button>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            <button class="chip-login" style="flex:1" onclick="login('admin','admin')">👑 Admin (admin:admin)</button>
-            <button class="chip-login" style="flex:1" onclick="login('rohit','staff')">📝 Staff (rohit:staff)</button>
-          </div>
-        </div>
-      </div>
     </div>`;
   },
 
@@ -512,7 +495,7 @@ const V = {
       <span class="sp"></span>
       <button class="btn" onclick="userForm()">+ Add User ID &amp; Password</button>
     </div>
-    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Ultra Admin' ? 'High' : (u.role === 'Super Admin' || u.role === 'Admin') ? 'Medium' : 'Low'}">${esc(u.role)}</span></td><td><span class="mut">${u.passPlain ? esc(u.passPlain) : 'Encrypted'}</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.role !== 'Ultra Admin' && u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
+    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password Status</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Ultra Admin' ? 'High' : (u.role === 'Super Admin' || u.role === 'Admin') ? 'Medium' : 'Low'}">${esc(u.role)}</span></td><td><span class="mut">••••••••</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.role !== 'Ultra Admin' && u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
   }
 };
 
