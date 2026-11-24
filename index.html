@@ -3,1460 +3,469 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2563eb">
-<link rel="manifest" href="manifest.json">
-<title>YMC &amp; ASSOCIATES — Enterprise CA Work Tracker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>YMC &amp; ASSOCIATES Work Tracker</title>
 <style>
-:root {
-  --bg: #0b1118;
-  --card: #131b26;
-  --card-hover: #192433;
-  --border: #243042;
-  --text: #e6edf5;
-  --text-muted: #8c9baebd;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: rgba(37, 99, 235, 0.15);
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.12);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --info: #06b6d4;
-  --info-bg: rgba(6, 182, 212, 0.12);
-  --radius: 10px;
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-header {
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.brand-box { display: flex; align-items: center; gap: 12px; }
-.logo-badge {
-  background: linear-gradient(135deg, var(--primary), #3b82f6);
-  color: #fff;
-  font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 15px;
-  letter-spacing: 0.5px;
-}
-.brand-name { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
-.brand-sub { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-.db-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 8px var(--success);
-}
-.top-actions { display: flex; align-items: center; gap: 12px; }
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--primary-light);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-.user-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 11px;
-}
-nav {
-  display: flex;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  overflow-x: auto;
-  gap: 8px;
-}
-nav button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  padding: 14px 16px;
-  font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: all 0.15s ease;
-}
-nav button:hover { color: var(--text); }
-nav button.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-}
-main {
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 24px;
-  flex: 1;
-}
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.kpi {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
-}
-.kpi .num {
-  font-size: 32px;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  margin-bottom: 4px;
-  line-height: 1;
-}
-.kpi .lbl {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.kpi.crit .num { color: var(--danger); }
-.kpi.warn .num { color: var(--warning); }
-.kpi.good .num { color: var(--success); }
-.kpi.info .num { color: var(--info); }
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 24px;
-}
-.card-hdr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.card-hdr h2 { font-size: 16px; font-weight: 700; }
-.btn {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: opacity 0.15s ease;
-}
-.btn:hover { opacity: 0.9; }
-.btn.sec { background: transparent; color: var(--text); border: 1px solid var(--border); }
-.btn.sec:hover { background: var(--card-hover); }
-.btn.danger { background: var(--danger); color: #fff; }
-.btn.sm { padding: 4px 8px; font-size: 12px; }
-.btn.success { background: var(--success); color: #fff; }
-.toolbar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.toolbar input, .toolbar select {
-  padding: 7px 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  outline: none;
-}
-.tbl-wrap { overflow-x: auto; width: 100%; border-radius: 6px; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-  text-align: left;
-}
-th {
-  background: rgba(255,255,255,0.02);
-  color: var(--text-muted);
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-}
-td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-tr:hover td { background: rgba(255, 255, 255, 0.015); }
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11.5px;
-  font-weight: 600;
-}
-.tag.High { background: var(--danger-bg); color: var(--danger); }
-.tag.Medium { background: var(--warning-bg); color: var(--warning); }
-.tag.Low { background: var(--info-bg); color: var(--info); }
-.tag.Pending { background: var(--warning-bg); color: var(--warning); }
-.tag.InProgress { background: var(--info-bg); color: var(--info); }
-.tag.Completed { background: var(--success-bg); color: var(--success); }
-.tag.Overdue { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 20px;
-}
-.auth-box {
-  max-width: 440px;
-  margin: 60px auto;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-.auth-box h2 { font-size: 20px; margin-bottom: 8px; font-weight: 700; text-align: center; }
-.auth-box p { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; text-align: center; }
-.field-grp { margin-bottom: 16px; }
-.field-grp label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-.field-grp input, .field-grp select, .field-grp textarea {
-  width: 100%;
-  padding: 9px 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13.5px;
-}
-.field-grp input:focus, .field-grp select:focus, .field-grp textarea:focus {
-  border-color: var(--primary);
-  outline: none;
-}
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-.modal {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 580px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 24px;
-}
-.modal-hdr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.modal-hdr h3 { font-size: 17px; font-weight: 700; }
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 24px;
-}
-.quick-login-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-  border-top: 1px dashed var(--border);
-  padding-top: 16px;
-}
-.chip {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11.5px;
-  cursor: pointer;
-  color: var(--text-muted);
-}
-.chip:hover { border-color: var(--primary); color: var(--primary); }
-.comp-calendar {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-.comp-item {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 14px;
-  background: var(--bg);
-  position: relative;
-}
-.comp-item.urgent { border-left: 4px solid var(--danger); }
-.comp-item.soon { border-left: 4px solid var(--warning); }
-.comp-title { font-weight: 700; font-size: 13.5px; margin-bottom: 2px; }
-.comp-sub { font-size: 12px; color: var(--text-muted); }
-.comp-due {
-  margin-top: 8px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-}
-.install-banner {
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  padding: 8px 16px;
-  font-size: 12.5px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d2733;--mut:#6b7684;--bd:#e3e0d8;--pri:#1f4e79;--pritx:#fff;--ok:#1e7a46;--okbg:#e2f3e9;--wa:#9a5b00;--wabg:#fdf0d8;--bad:#b3261e;--badbg:#fbe4e2;--inf:#1f4e79;--infbg:#e1ecf7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--card:#1d232b;--tx:#e8ebef;--mut:#99a3b0;--bd:#2d3540;--pri:#5b9bd5;--pritx:#0d1520;--ok:#6fd09a;--okbg:#17342500;--wa:#f0b45a;--wabg:#3a2d12;--bad:#f2928b;--badbg:#3d1c1a;--inf:#8dbbe6;--infbg:#1b2b3d;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--pri);color:var(--pritx);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font:600 18px Georgia,serif}header small{opacity:.8}
+.hdr-right{display:flex;align-items:center;gap:10px;font-size:13px}
+.hdr-user{background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2)}
+.hdr-user b{color:#fff}
+.hdr-btn{background:#fff;color:var(--pri);border:0;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer}
+nav{display:flex;gap:4px;padding:10px 16px 0;overflow-x:auto;border-bottom:1px solid var(--bd);background:var(--card)}
+nav button{border:0;background:none;color:var(--mut);padding:10px 14px;font:inherit;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.on{color:var(--pri);border-color:var(--pri)}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.stat b{display:block;font-size:28px;font-family:Georgia,serif}.stat span{color:var(--mut);font-size:13px}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:16px}
+.panel h2{margin:0 0 10px;font-size:15px}
+.two{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar .sp{flex:1}
+select,input,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);max-width:100%}
+textarea{width:100%;min-height:70px}
+.btn{background:var(--pri);color:var(--pritx);border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.g{background:none;color:var(--pri);border:1px solid var(--bd)}.btn.s{padding:4px 9px;font-size:13px}.btn.d{background:none;color:var(--bad);border:1px solid var(--bd)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+th,td{padding:8px 8px;border-bottom:1px solid var(--bd);vertical-align:top}
+tr.od td:first-child{box-shadow:inset 3px 0 var(--bad)}
+.b{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
+.Pending{background:var(--wabg);color:var(--wa)}.In-Progress{background:var(--infbg);color:var(--inf)}.Completed{background:var(--okbg);color:var(--ok)}
+.High{background:var(--badbg);color:var(--bad)}.Medium{background:var(--wabg);color:var(--wa)}.Low{background:var(--infbg);color:var(--inf)}
+.mut{color:var(--mut)}.empty{padding:22px;text-align:center;color:var(--mut)}
+.ov{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.md{background:var(--card);border-radius:12px;padding:18px;width:100%;max-width:460px;max-height:90vh;overflow:auto}
+.md h3{margin:0 0 12px}.md label{display:block;font-size:13px;color:var(--mut);margin:10px 0 3px}.md input,.md select{width:100%}
+.md .act{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;margin-right:4px}
+.chip-login{background:var(--card);border:1px solid var(--bd);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:12px}
+.chip-login:hover{border-color:var(--pri);color:var(--pri)}
 </style>
 </head>
 <body>
-
-<div id="installBanner" class="install-banner" style="display:none;">
-  <span>📱 <b>Install Mobile App / Desktop Portal</b>: Click to add directly to Home Screen (No app store needed)</span>
-  <button id="installBtn" class="btn sm success" style="margin-left:10px;">Install App Now</button>
-</div>
-
 <header>
-  <div class="brand-box">
-    <div class="logo-badge">YMC</div>
-    <div>
-      <div class="brand-name">YMC &amp; ASSOCIATES</div>
-      <div class="brand-sub">
-        <span class="db-indicator"></span> Neon PostgreSQL Connected &bull; Practice ERP v4.5
-      </div>
-    </div>
+  <div>
+    <h1>YMC &amp; ASSOCIATES Work Tracker</h1>
+    <small><span class="sync-dot"></span>Neon PostgreSQL Cloud Synced &bull; Client-wise daily records, pending tasks and team progress</small>
   </div>
-  <div class="top-actions" id="topNavUser"></div>
+  <div class="hdr-right" id="hdrUser"></div>
 </header>
-
-<nav id="mainNav"></nav>
-<main id="appView"></main>
-<div id="modalContainer"></div>
-
+<nav id="nav"></nav>
+<main id="v"></main>
+<div id="m"></div>
 <script>
-/* -------------------------------------------------------------
-   PWA INSTALL & SERVICE WORKER SETUP
-------------------------------------------------------------- */
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const banner = document.getElementById('installBanner');
-  if (banner) banner.style.display = 'flex';
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('installBtn');
-  if (btn) {
-    btn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          document.getElementById('installBanner').style.display = 'none';
-        }
-        deferredPrompt = null;
-      }
-    });
-  }
-});
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-/* -------------------------------------------------------------
-   STATE & PERSISTENCE WITH NEON CLOUD SYNC
-------------------------------------------------------------- */
-const STORAGE_KEY = 'ymc_ca_erp_v4';
-
-let state = {
-  session: null,
-  currentTab: 'dashboard',
-  filterStatus: 'Open',
-  filterClient: '',
-  filterStaff: '',
-  searchQuery: '',
-  db: {
-    users: [
-      { id: 'usr_admin', username: 'admin', password_hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'CA Yash Mehta (Partner)', role: 'Admin', email: 'partner@ymcca.in' },
-      { id: 'usr_mgr', username: 'manager', password_hash: 'e6c279e8a5b28a9b4009e53096b744d03d011f0088031e8460dd804dfa29910d', name: 'Sneha Patel (FCA Senior)', role: 'Manager', email: 'sneha@ymcca.in' },
-      { id: 'usr_staff1', username: 'rohit', password_hash: 'f4f10714777559e2b146e25dc7d03df62ef58667b2d561d31cfc2df36294b41a', name: 'Rohit Sharma (Article)', role: 'Staff', email: 'rohit@ymcca.in' },
-      { id: 'usr_client', username: 'client', password_hash: 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b', name: 'Rajesh Singhania', role: 'Client', client_id: 'c1' }
-    ],
-    clients: [
-      { id: 'c1', name: 'Singhania Logistics Ltd', pan: 'AAACS1234D', gstin: '27AAACS1234D1Z2', type: 'Company', phone: '+91 98200 11223', email: 'finance@singhanialogistics.com', billing_rate: 1500 },
-      { id: 'c2', name: 'Apex FinTech LLP', pan: 'AABFA9876E', gstin: '27AABFA9876E1Z1', type: 'Partnership/LLP', phone: '+91 98199 44556', email: 'accounts@apexfin.io', billing_rate: 2000 },
-      { id: 'c3', name: 'Dr. Amitav Banerjee', pan: 'BPRPB5544K', gstin: '', type: 'Individual', phone: '+91 98450 67890', email: 'dramitav@gmail.com', billing_rate: 1200 }
-    ],
-    tasks: [
-      { id: 't1', client: 'c1', title: 'Statutory Audit FY 25-26 Scrutiny', type: 'Audit', emp: 'usr_staff1', due: '2026-11-28', priority: 'High', status: 'In Progress', estHours: 40, billable: true },
-      { id: 't2', client: 'c2', title: 'Filing GSTR-3B & Input Reconciliation', type: 'GST Return', emp: 'usr_staff1', due: '2026-11-20', priority: 'High', status: 'Pending', estHours: 5, billable: true },
-      { id: 't3', client: 'c3', title: 'ITR-3 Filing with Medical Profession P&L', type: 'Income Tax Return', emp: 'usr_mgr', due: '2026-12-10', priority: 'Medium', status: 'Pending', estHours: 8, billable: true },
-      { id: 't4', client: 'c1', title: 'MCA Filing AOC-4 XBRL Preparation', type: 'ROC/MCA Filing', emp: 'usr_mgr', due: '2026-11-30', priority: 'High', status: 'In Progress', estHours: 15, billable: true }
-    ],
-    logs: [
-      { id: 'l1', date: '2026-11-24', client: 'c1', emp: 'usr_staff1', work: 'Vouching bank ledgers and sales invoices for Q2', hours: 4.5, billable: true },
-      { id: 'l2', date: '2026-11-23', client: 'c2', emp: 'usr_staff1', work: 'GSTR-2B 100% matched against books; ₹1.4L ITC saved', hours: 3, billable: true },
-      { id: 'l3', date: '2026-11-24', client: 'c3', emp: 'usr_mgr', work: 'Draft computation review and advance tax estimation', hours: 2, billable: true }
-    ],
-    compliances: [
-      { id: 'comp_1', title: 'GSTR-3B (Monthly)', cat: 'GST', due: '2026-11-20', period: 'Oct 2026', penalty: '₹50/day' },
-      { id: 'comp_2', title: 'GSTR-1 (Monthly)', cat: 'GST', due: '2026-11-11', period: 'Oct 2026', penalty: '₹50/day' },
-      { id: 'comp_3', title: 'TDS/TCS Deposit (Challan 281)', cat: 'Income Tax', due: '2026-12-07', period: 'Nov 2026', penalty: '1.5% pm' },
-      { id: 'comp_4', title: 'Advance Tax (3rd Installment)', cat: 'Income Tax', due: '2026-12-15', period: 'FY 2026-27 Q3', penalty: 'Sec 234C' },
-      { id: 'comp_5', title: 'ROC AOC-4 (Financial Statements)', cat: 'MCA/ROC', due: '2026-11-30', period: 'FY 2025-26', penalty: '₹100/day' },
-      { id: 'comp_6', title: 'ROC MGT-7 (Annual Return)', cat: 'MCA/ROC', due: '2026-12-31', period: 'FY 2025-26', penalty: '₹100/day' }
-    ]
-  }
+const K = 'cafirm_v2';
+let db = {
+  users: [
+    { id: 'usr_admin', username: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'CA Yash Mehta (Admin)', role: 'Admin' },
+    { id: 'usr_mgr', username: 'manager', passHash: 'e6c279e8a5b28a9b4009e53096b744d03d011f0088031e8460dd804dfa29910d', name: 'Sneha Patel (Manager)', role: 'Manager' },
+    { id: 'usr_staff1', username: 'rohit', passHash: 'f4f10714777559e2b146e25dc7d03df62ef58667b2d561d31cfc2df36294b41a', name: 'Rohit Sharma (Article)', role: 'Staff' }
+  ],
+  clients: [],
+  emps: [],
+  tasks: [],
+  logs: []
 };
 
-// Local cache load
+let currentUser = null;
+
 try {
-  const local = localStorage.getItem(STORAGE_KEY);
-  if (local) state.db = Object.assign(state.db, JSON.parse(local));
-  const savedSession = sessionStorage.getItem(STORAGE_KEY + '_session');
-  if (savedSession) state.session = JSON.parse(savedSession);
+  const s = localStorage.getItem(K);
+  if (s) db = Object.assign(db, JSON.parse(s));
+  const u = sessionStorage.getItem(K + '_u');
+  if (u) currentUser = JSON.parse(u);
 } catch(e) {}
 
-// Sync with Vercel Serverless /api/db endpoint if online
-async function syncNeonData() {
+const save = (action, table, data, id) => {
+  try {
+    localStorage.setItem(K, JSON.stringify(db));
+    if (action) {
+      fetch('/api/db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, table, data, id })
+      }).catch(() => {});
+    }
+  } catch(e) {}
+};
+
+async function syncWithNeon() {
   try {
     const res = await fetch('/api/db?type=all');
     if (res.ok) {
       const data = await res.json();
       if (data.users && data.users.length) {
-        state.db.users = data.users;
-        state.db.clients = data.clients;
-        state.db.tasks = data.tasks;
-        state.db.logs = data.logs;
-        state.db.compliances = data.compliances;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
+        db.users = data.users.map(u => ({ id: u.id, username: u.username, passHash: u.password_hash, name: u.name, role: u.role }));
+        db.clients = data.clients;
+        db.emps = data.users.filter(u => u.role !== 'Client').map(u => ({ id: u.id, name: u.name, role: u.role }));
+        db.tasks = data.tasks;
+        db.logs = data.logs;
+        localStorage.setItem(K, JSON.stringify(db));
         render();
       }
     }
-  } catch (err) {
-    // Falls back seamlessly to offline / local state
-  }
-}
-
-// Call API to persist to Neon
-async function cloudSync(action, table, data, id) {
-  try {
-    await fetch('/api/db', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, table, data, id })
-    });
   } catch(e) {}
 }
 
-const saveLocalAndCloud = (action, table, data, id) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
-  if (action) cloudSync(action, table, data, id);
-};
-
-// Helper utils
-async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+async function sha256(msg) {
+  const b = new TextEncoder().encode(msg);
+  const h = await crypto.subtle.digest('SHA-256', b);
+  return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join('');
 }
 
-const uid = () => 'id_' + Math.random().toString(36).substr(2, 9);
-const todayStr = () => new Date().toISOString().slice(0, 10);
-const fmtDate = (d) => d ? new Date(d + 'T00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const getClientName = id => (state.db.clients.find(c => c.id === id) || {}).name || '—';
-const getUserName = id => (state.db.users.find(u => u.id === id) || {}).name || '—';
-const isOverdue = t => t.status !== 'Completed' && t.due && t.due < todayStr();
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+const fmt = d => d ? new Date(d + 'T00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const cn = id => (db.clients.find(c => c.id == id) || {}).name || '—';
+const en = id => (db.emps.find(c => c.id == id) || {}).name || '—';
 
-/* -------------------------------------------------------------
-   AUTHENTICATION
-------------------------------------------------------------- */
-async function loginUser(username, password) {
-  const hash = await sha256(password);
-  const user = state.db.users.find(u => u.username.toLowerCase() === username.trim().toLowerCase() && (u.password_hash === hash || u.passHash === hash));
-  if (!user) {
-    alert('Invalid username or password!');
-    return false;
+const WT = ['GST Return', 'Income Tax Return', 'TDS/TCS', 'Audit', 'ROC/MCA Filing', 'Bookkeeping', 'Accounting', 'Notice/Appeal', 'Payroll/PF/ESI', 'Other'];
+const TABS = [
+  ['dash', 'Dashboard'],
+  ['tasks', 'Pending Tasks'],
+  ['log', 'Daily Work Log'],
+  ['clients', 'Clients'],
+  ['team', 'Team'],
+  ['users', 'Multi-ID & Passwords']
+];
+
+let tab = 'dash', f = { ts: 'Open', tc: '', te: '', ld: today(), le: '', lc: '' };
+const opt = (arr, sel, all) => (all != null ? `<option value="">${all}</option>` : '') + arr.map(a => { const [v, l] = Array.isArray(a) ? a : [a, a]; return `<option value="${esc(v)}"${v == sel ? ' selected' : ''}>${esc(l)}</option>`; }).join('');
+const cOpts = () => db.clients.map(c => [c.id, c.name]);
+const eOpts = () => db.emps.map(c => [c.id, c.name]);
+const isOd = t => t.status !== 'Completed' && t.due && t.due < today();
+
+function form(title, fields, vals, onSave) {
+  vals = vals || {};
+  m.innerHTML = `<div class="ov"><div class="md"><h3>${title}</h3>${fields.map(x => {
+    const v = vals[x.k] != null ? vals[x.k] : (x.def || '');
+    let i;
+    if (x.t === 'select') i = `<select id="f_${x.k}">${opt(x.o, v)}</select>`;
+    else if (x.t === 'area') i = `<textarea id="f_${x.k}">${esc(v)}</textarea>`;
+    else i = `<input id="f_${x.k}" type="${x.t || 'text'}" value="${esc(v)}"${x.t === 'number' ? ' step="0.25" min="0"' : ''}>`;
+    return `<label>${x.l}${x.r ? ' *' : ''}</label>${i}`;
+  }).join('')}
+  <div class="act"><button class="btn g" onclick="closeM()">Cancel</button><button class="btn" id="sv">Save</button></div></div></div>`;
+  
+  document.getElementById('sv').onclick = () => {
+    const o = {};
+    for (const x of fields) {
+      o[x.k] = document.getElementById('f_' + x.k).value.trim();
+      if (x.r && !o[x.k]) { alert('Please fill: ' + x.l); return; }
+    }
+    onSave(o);
+    closeM();
+    render();
+  };
+}
+
+const closeM = () => { m.innerHTML = ''; };
+function needBase() {
+  if (!db.clients.length) { alert('Please add a client first (Clients tab).'); return true; }
+  if (!db.emps.length) { alert('Please add team members first (Team tab).'); return true; }
+  return false;
+}
+
+/* Authentication */
+async function login(un, pw) {
+  const hash = await sha256(pw);
+  const u = db.users.find(x => x.username.toLowerCase() === un.trim().toLowerCase() && (x.passHash === hash || x.password_hash === hash));
+  if (!u) {
+    alert('Invalid username or password');
+    return;
   }
-  state.session = { id: user.id, username: user.username, name: user.name, role: user.role, clientId: user.client_id || user.clientId };
-  sessionStorage.setItem(STORAGE_KEY + '_session', JSON.stringify(state.session));
-  state.currentTab = user.role === 'Client' ? 'client_portal' : 'dashboard';
+  currentUser = u;
+  sessionStorage.setItem(K + '_u', JSON.stringify(currentUser));
   render();
-  return true;
 }
 
-function logoutUser() {
-  state.session = null;
-  sessionStorage.removeItem(STORAGE_KEY + '_session');
+function logout() {
+  currentUser = null;
+  sessionStorage.removeItem(K + '_u');
   render();
 }
 
-function quickLogin(u, p) {
-  loginUser(u, p);
+function taskForm(id) {
+  if (needBase()) return;
+  const t = db.tasks.find(x => x.id === id);
+  form(t ? 'Edit task' : 'New task', [
+    { k: 'client', l: 'Client', t: 'select', o: cOpts(), r: 1 },
+    { k: 'type', l: 'Work type', t: 'select', o: WT },
+    { k: 'title', l: 'Task details', r: 1 },
+    { k: 'emp', l: 'Assigned to', t: 'select', o: eOpts(), r: 1 },
+    { k: 'due', l: 'Due date', t: 'date' },
+    { k: 'priority', l: 'Priority', t: 'select', o: ['High', 'Medium', 'Low'], def: 'Medium' },
+    { k: 'status', l: 'Status', t: 'select', o: ['Pending', 'In Progress', 'Completed'], def: 'Pending' }
+  ], t, o => {
+    if (t) {
+      Object.assign(t, o);
+      save('insert', 'tasks', t);
+    } else {
+      const newTask = { id: uid(), created: today(), ...o };
+      db.tasks.push(newTask);
+      save('insert', 'tasks', newTask);
+    }
+  });
 }
 
-/* -------------------------------------------------------------
-   NAVIGATION TABS
-------------------------------------------------------------- */
-function getTabs() {
-  if (!state.session) return [];
-  const r = state.session.role;
-  if (r === 'Client') {
-    return [
-      ['client_portal', '📑 My Compliance & Filings'],
-      ['profile', '👤 My Profile']
-    ];
-  }
-  const base = [
-    ['dashboard', '📊 Executive Dashboard'],
-    ['tasks', '📋 Work & Tasks'],
-    ['logs', '⏱️ Timesheet & Daily Log'],
-    ['compliances', '⚖️ Due Date Calendar'],
-    ['clients', '🏢 Clients Directory']
-  ];
-  if (r === 'Admin' || r === 'Manager') {
-    base.push(['team', '👥 Firm Team & Roles']);
-  }
-  if (r === 'Admin') {
-    base.push(['security', '🔐 Multi-ID Access & Security']);
-    base.push(['backup', '💾 Data Backup & Restore']);
-  }
-  base.push(['profile', '👤 My Account']);
-  return base;
+function completeTask(id) {
+  const t = db.tasks.find(x => x.id === id);
+  form('Mark complete', [
+    { k: 'emp', l: 'Completed by', t: 'select', o: eOpts(), def: (currentUser ? currentUser.id : t.emp), r: 1 },
+    { k: 'date', l: 'Date completed', t: 'date', def: today(), r: 1 },
+    { k: 'hours', l: 'Hours spent', t: 'number' },
+    { k: 'note', l: 'Notes (optional)', t: 'area' }
+  ], { emp: t.emp }, o => {
+    t.status = 'Completed';
+    t.completedOn = o.date;
+    t.completedBy = o.emp;
+    save('update_task_done', 'tasks', { completedOn: o.date, completedBy: o.emp }, t.id);
+
+    const newLog = {
+      id: uid(),
+      date: o.date,
+      client: t.client,
+      emp: o.emp,
+      work: t.type + ': ' + t.title + (o.note ? ' (' + o.note + ')' : ''),
+      hours: o.hours,
+      task: t.id
+    };
+    db.logs.push(newLog);
+    save('insert', 'logs', newLog);
+  });
 }
 
-/* -------------------------------------------------------------
-   VIEWS
-------------------------------------------------------------- */
-const Views = {
+function logForm(id) {
+  if (needBase()) return;
+  const l = db.logs.find(x => x.id === id);
+  form(l ? 'Edit entry' : 'Add work done', [
+    { k: 'date', l: 'Date', t: 'date', def: today(), r: 1 },
+    { k: 'client', l: 'Client', t: 'select', o: cOpts(), r: 1 },
+    { k: 'emp', l: 'Done by (employee)', t: 'select', o: eOpts(), def: (currentUser ? currentUser.id : ''), r: 1 },
+    { k: 'work', l: 'Work done', t: 'area', r: 1 },
+    { k: 'hours', l: 'Hours spent', t: 'number' }
+  ], l, o => {
+    if (l) {
+      Object.assign(l, o);
+      save('insert', 'logs', l);
+    } else {
+      const newLog = { id: uid(), ...o };
+      db.logs.push(newLog);
+      save('insert', 'logs', newLog);
+    }
+  });
+}
+
+function clientForm(id) {
+  const c = db.clients.find(x => x.id === id);
+  form(c ? 'Edit client' : 'New client', [
+    { k: 'name', l: 'Client name', r: 1 },
+    { k: 'type', l: 'Type', t: 'select', o: ['Individual', 'Proprietorship', 'Partnership/LLP', 'Company', 'Trust/Other'] },
+    { k: 'pan', l: 'PAN' },
+    { k: 'gstin', l: 'GSTIN' },
+    { k: 'phone', l: 'Contact Phone' },
+    { k: 'email', l: 'Email' }
+  ], c, o => {
+    if (c) {
+      Object.assign(c, o);
+      save('insert', 'clients', c);
+    } else {
+      const newC = { id: uid(), ...o };
+      db.clients.push(newC);
+      save('insert', 'clients', newC);
+    }
+  });
+}
+
+function empForm() {
+  form('Add team member', [
+    { k: 'name', l: 'Employee name', r: 1 },
+    { k: 'role', l: 'Role (e.g. Article, Accountant, Partner)', r: 1 }
+  ], null, o => {
+    const newEmp = { id: uid(), ...o };
+    db.emps.push(newEmp);
+    save('insert', 'users', { id: newEmp.id, username: newEmp.name.toLowerCase().replace(/\s+/g, ''), name: newEmp.name, role: newEmp.role, password_hash: '' });
+  });
+}
+
+function userForm() {
+  form('Create User ID & Password', [
+    { k: 'username', l: 'Username / Login ID', r: 1 },
+    { k: 'name', l: 'Display Name', r: 1 },
+    { k: 'role', l: 'Role', t: 'select', o: ['Staff', 'Manager', 'Admin'], def: 'Staff' },
+    { k: 'password', l: 'Password', r: 1 }
+  ], null, async o => {
+    const hash = await sha256(o.password);
+    const newU = { id: uid(), username: o.username.toLowerCase(), name: o.name, role: o.role, passHash: hash, password_hash: hash };
+    db.users.push(newU);
+    db.emps.push({ id: newU.id, name: newU.name, role: newU.role });
+    save('insert', 'users', newU);
+    alert('User @' + o.username + ' created successfully!');
+    render();
+  });
+}
+
+async function resetUserPass(id) {
+  const u = db.users.find(x => x.id === id);
+  const p = prompt('Set new password for @' + u.username + ':');
+  if (!p) return;
+  u.passHash = await sha256(p);
+  u.password_hash = u.passHash;
+  save('insert', 'users', u);
+  alert('Password updated for @' + u.username);
+  render();
+}
+
+function del(k, id, msg) {
+  if (confirm(msg || 'Delete this record?')) {
+    db[k] = db[k].filter(x => x.id !== id);
+    if (k === 'clients') {
+      db.tasks = db.tasks.filter(x => x.client !== id);
+      db.logs = db.logs.filter(x => x.client !== id);
+    }
+    save('delete', k, null, id);
+    render();
+  }
+}
+
+function clientView(id) {
+  const c = db.clients.find(x => x.id === id);
+  if (!c) return;
+  const ts = db.tasks.filter(t => t.client === id);
+  const ls = db.logs.filter(l => l.client === id).sort((a, b) => b.date.localeCompare(a.date));
+
+  m.innerHTML = `<div class="ov"><div class="md" style="max-width:620px">
+    <h3>${esc(c.name)}</h3>
+    <div class="mut">${esc(c.type || '')} ${c.pan ? '· PAN: ' + esc(c.pan) : ''} ${c.gstin ? '· GST: ' + esc(c.gstin) : ''} ${c.phone ? '· ' + esc(c.phone) : ''}</div>
+    <h4>Open tasks</h4>
+    ${ts.filter(t => t.status !== 'Completed').map(t => `<div>${isOd(t) ? '⚠ ' : ''}${esc(t.type)}: ${esc(t.title)} <span class="mut">· ${esc(en(t.emp))} · due ${fmt(t.due)}</span></div>`).join('') || '<div class="mut">None</div>'}
+    <h4>Work history</h4>
+    ${ls.slice(0, 25).map(l => `<div>${fmt(l.date)} — ${esc(l.work)} <span class="mut">· ${esc(en(l.emp))}${l.hours ? ' · ' + esc(l.hours) + 'h' : ''}</span></div>`).join('') || '<div class="mut">No work recorded yet</div>'}
+    <div class="act"><button class="btn" onclick="closeM()">Close</button></div>
+  </div></div>`;
+}
+
+function taskRows(list) {
+  return list.length ? `<div class="tw"><table><tr><th>Due</th><th>Client</th><th>Work</th><th>Assigned</th><th>Priority</th><th>Status</th><th></th></tr>${list.map(t => `<tr class="${isOd(t) ? 'od' : ''}"><td>${fmt(t.due)}${isOd(t) ? '<br><span class="b High">Overdue</span>' : ''}</td><td>${esc(cn(t.client))}</td><td><b>${esc(t.type)}</b><br>${esc(t.title)}</td><td>${esc(en(t.emp))}</td><td><span class="b ${t.priority}">${t.priority}</span></td><td><span class="b ${t.status.replace(' ', '-')}">${t.status}</span>${t.completedOn ? '<br><span class="mut">' + fmt(t.completedOn) + ' by ' + esc(en(t.completedBy)) + '</span>' : ''}</td><td style="white-space:nowrap">${t.status !== 'Completed' ? `<button class="btn s" onclick="completeTask('${t.id}')">Complete</button> ` : ''}<button class="btn g s" onclick="taskForm('${t.id}')">Edit</button> <button class="btn d s" onclick="del('tasks','${t.id}')">✕</button></td></tr>`).join('')}</table></div>` : '<div class="empty">No tasks found.</div>';
+}
+
+const V = {
   login() {
-    return `
-    <div class="auth-box">
-      <h2>CA Firm Portal Login</h2>
-      <p>Secure Enterprise Sign-In with Neon PostgreSQL Cloud Sync</p>
-      <form onsubmit="event.preventDefault(); loginUser(this.un.value, this.pw.value);">
-        <div class="field-grp">
-          <label>Username / Login ID</label>
-          <input type="text" name="un" id="login_un" required placeholder="e.g. admin or rohit" autocomplete="username">
-        </div>
-        <div class="field-grp">
-          <label>Password</label>
-          <input type="password" name="pw" id="login_pw" required placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn" style="width: 100%; justify-content: center; padding: 11px; margin-top: 8px;">
-          Authenticate Session
-        </button>
+    return `<div class="panel" style="max-width:440px;margin:50px auto;padding:24px;">
+      <h2 style="font-size:18px;margin-bottom:6px;">Sign In to CA Work Tracker</h2>
+      <div class="mut" style="margin-bottom:18px;">Neon PostgreSQL Cloud Connected &bull; Multi-ID Login</div>
+      <form onsubmit="event.preventDefault(); login(this.u.value, this.p.value);">
+        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Username</label>
+        <input style="width:100%;margin-bottom:12px;" type="text" name="u" placeholder="admin or rohit" required autofocus>
+        <label class="mut" style="font-size:12px;display:block;margin-bottom:4px;">Password</label>
+        <input style="width:100%;margin-bottom:16px;" type="password" name="p" placeholder="••••••••" required>
+        <button class="btn" style="width:100%;" type="submit">Log In</button>
       </form>
-      <div class="quick-login-chips">
-        <span style="font-size: 11px; width: 100%; color: var(--text-muted); margin-bottom: 4px;">Click 1-Click Demo Login:</span>
-        <button class="chip" onclick="quickLogin('admin','admin')">👑 Partner (admin:admin)</button>
-        <button class="chip" onclick="quickLogin('manager','manager')">💼 Senior (manager:manager)</button>
-        <button class="chip" onclick="quickLogin('rohit','staff')">📝 Article (rohit:staff)</button>
-        <button class="chip" onclick="quickLogin('client','client')">🏢 Client (client:client)</button>
+      <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:14px;">
+        <span class="mut" style="font-size:12px;display:block;margin-bottom:6px;">Quick 1-Click Access:</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="chip-login" onclick="login('admin','admin')">👑 Admin (admin:admin)</button>
+          <button class="chip-login" onclick="login('manager','manager')">💼 Manager (manager:manager)</button>
+          <button class="chip-login" onclick="login('rohit','staff')">📝 Article (rohit:staff)</button>
+        </div>
       </div>
     </div>`;
   },
 
-  dashboard() {
-    let tasks = state.db.tasks;
-    if (state.session.role === 'Staff') {
-      tasks = tasks.filter(t => t.emp === state.session.id);
-    }
-    const openTasks = tasks.filter(t => t.status !== 'Completed');
-    const overdueTasks = openTasks.filter(isOverdue);
-    const todayLogs = state.db.logs.filter(l => l.date === todayStr());
-    const totalTodayHours = todayLogs.reduce((acc, x) => acc + (+x.hours || 0), 0);
-    const unbilledAmount = state.db.logs.filter(l => l.billable).reduce((acc, l) => {
-      const cl = state.db.clients.find(c => c.id === l.client);
-      return acc + ((+l.hours || 0) * (cl?.billing_rate || 1000));
-    }, 0);
-
-    return `
-    <div class="kpi-row">
-      <div class="kpi info">
-        <div class="num">${openTasks.length}</div>
-        <div class="lbl">${state.session.role === 'Staff' ? 'My Open Tasks' : 'Firm Open Tasks'}</div>
-      </div>
-      <div class="kpi crit">
-        <div class="num">${overdueTasks.length}</div>
-        <div class="lbl">Critical Overdue</div>
-      </div>
-      <div class="kpi good">
-        <div class="num">${totalTodayHours.toFixed(1)}h</div>
-        <div class="lbl">Work Logged Today</div>
-      </div>
-      <div class="kpi warn">
-        <div class="num">₹${(unbilledAmount / 1000).toFixed(1)}k</div>
-        <div class="lbl">Estimated Work Value</div>
-      </div>
+  dash() {
+    const td = today(), open = db.tasks.filter(t => t.status !== 'Completed'), dl = db.logs.filter(l => l.date === td);
+    const hrs = dl.reduce((a, l) => a + (+l.hours || 0), 0);
+    return `<div class="grid">
+      <div class="stat"><b>${open.length}</b><span>Pending tasks</span></div>
+      <div class="stat"><b style="color:var(--bad)">${open.filter(isOd).length}</b><span>Overdue</span></div>
+      <div class="stat"><b>${dl.length}</b><span>Work entries today</span></div>
+      <div class="stat"><b>${hrs.toFixed(1)}</b><span>Hours logged today</span></div>
+      <div class="stat"><b>${db.clients.length}</b><span>Clients</span></div>
     </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-hdr">
-          <h2>⚠️ High Priority &amp; Approaching Deadlines</h2>
-          <button class="btn sm" onclick="taskModal()">+ New Task</button>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Due</th>
-                <th>Client</th>
-                <th>Task</th>
-                <th>Assigned</th>
-                <th>Priority</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${openTasks.sort((a,b) => (a.due||'9').localeCompare(b.due||'9')).slice(0, 5).map(t => `
-                <tr style="${isOverdue(t) ? 'background: var(--danger-bg);' : ''}">
-                  <td><b>${fmtDate(t.due)}</b>${isOverdue(t) ? '<br><span class="tag Overdue">OVERDUE</span>' : ''}</td>
-                  <td><b>${esc(getClientName(t.client))}</b></td>
-                  <td>${esc(t.title)}<br><span style="font-size:11px;color:var(--text-muted)">${esc(t.type)}</span></td>
-                  <td>${esc(getUserName(t.emp))}</td>
-                  <td><span class="tag ${t.priority}">${t.priority}</span></td>
-                </tr>
-              `).join('') || '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-muted)">No pending tasks</td></tr>'}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-hdr">
-          <h2>🗓️ Statutory Compliance Deadlines</h2>
-          <button class="btn sec sm" onclick="state.currentTab='compliances';render();">View All</button>
-        </div>
-        <div class="comp-calendar">
-          ${state.db.compliances.slice(0, 4).map(c => `
-            <div class="comp-item ${c.due <= todayStr() ? 'urgent' : 'soon'}">
-              <div class="comp-title">${esc(c.title)}</div>
-              <div class="comp-sub">${esc(c.cat)} &bull; Period: ${esc(c.period)}</div>
-              <div class="comp-due">
-                <span>Due: ${fmtDate(c.due)}</span>
-                <span style="color:var(--danger)">Penalty: ${esc(c.penalty)}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>`;
+    <div class="two">
+      <div class="panel"><h2>Today’s work (${fmt(td)})</h2>${dl.length ? `<div class="tw"><table>${dl.map(l => `<tr><td><b>${esc(cn(l.client))}</b><br>${esc(l.work)}</td><td>${esc(en(l.emp))}</td></tr>`).join('')}</table></div>` : '<div class="empty">Nothing logged today yet.</div>'}</div>
+      <div class="panel"><h2>Team workload</h2>${db.emps.length ? `<div class="tw"><table><tr><th>Employee</th><th>Pending</th><th>Done today</th></tr>${db.emps.map(e => `<tr><td>${esc(e.name)}</td><td>${open.filter(t => t.emp === e.id).length}</td><td>${dl.filter(l => l.emp === e.id).length}</td></tr>`).join('')}</table></div>` : '<div class="empty">Add team members in the Team tab.</div>'}</div>
+    </div>
+    <div class="panel"><h2>Client-wise pending work</h2>${db.clients.length ? `<div class="tw"><table><tr><th>Client</th><th>Pending</th><th>Overdue</th><th>Next due</th></tr>${db.clients.map(c => { const o = open.filter(t => t.client === c.id), nd = o.map(t => t.due).filter(Boolean).sort()[0]; return `<tr><td><a href="#" onclick="clientView('${c.id}');return false">${esc(c.name)}</a></td><td>${o.length}</td><td>${o.filter(isOd).length}</td><td>${fmt(nd)}</td></tr>`; }).join('')}</table></div>` : '<div class="empty">Start by adding your clients.</div>'}</div>`;
   },
 
   tasks() {
-    let list = [...state.db.tasks];
-    if (state.filterStatus === 'Open') list = list.filter(t => t.status !== 'Completed');
-    else if (state.filterStatus !== 'All') list = list.filter(t => t.status === state.filterStatus);
-    
-    if (state.filterClient) list = list.filter(t => t.client === state.filterClient);
-    if (state.filterStaff) list = list.filter(t => t.emp === state.filterStaff);
-    if (state.searchQuery) {
-      const q = state.searchQuery.toLowerCase();
-      list = list.filter(t => t.title.toLowerCase().includes(q) || getClientName(t.client).toLowerCase().includes(q));
-    }
-    list.sort((a,b) => (a.due||'9').localeCompare(b.due||'9'));
-
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <h2>Assignment &amp; Task Command Center</h2>
-        ${state.session.role !== 'Client' ? `<button class="btn" onclick="taskModal()">+ Add New Task</button>` : ''}
-      </div>
-      <div class="toolbar">
-        <input type="text" placeholder="Search client or task..." value="${esc(state.searchQuery)}" oninput="state.searchQuery=this.value;render();">
-        <select onchange="state.filterStatus=this.value;render();">
-          <option value="Open" ${state.filterStatus==='Open'?'selected':''}>Filter: Open (Pending + In Progress)</option>
-          <option value="Pending" ${state.filterStatus==='Pending'?'selected':''}>Pending</option>
-          <option value="In Progress" ${state.filterStatus==='In Progress'?'selected':''}>In Progress</option>
-          <option value="Completed" ${state.filterStatus==='Completed'?'selected':''}>Completed</option>
-          <option value="All" ${state.filterStatus==='All'?'selected':''}>All Tasks</option>
-        </select>
-        <select onchange="state.filterClient=this.value;render();">
-          <option value="">All Clients</option>
-          ${state.db.clients.map(c => `<option value="${c.id}" ${state.filterClient===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
-        </select>
-        <select onchange="state.filterStaff=this.value;render();">
-          <option value="">All Assignees</option>
-          ${state.db.users.filter(u=>u.role!=='Client').map(u => `<option value="${u.id}" ${state.filterStaff===u.id?'selected':''}>${esc(u.name)} (${u.role})</option>`).join('')}
-        </select>
-      </div>
-
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Due Date</th>
-              <th>Client</th>
-              <th>Compliance/Task</th>
-              <th>Assigned To</th>
-              <th>Est. Hrs</th>
-              <th>Priority</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${list.map(t => `
-              <tr style="${isOverdue(t)?'background:var(--danger-bg);':''}">
-                <td><span class="tag ${t.status.replace(/\s+/g,'')}">${t.status}</span></td>
-                <td>
-                  <b>${fmtDate(t.due)}</b>
-                  ${isOverdue(t) ? '<br><span class="tag Overdue">OVERDUE</span>' : ''}
-                </td>
-                <td><b>${esc(getClientName(t.client))}</b></td>
-                <td>
-                  <strong>${esc(t.title)}</strong><br>
-                  <small style="color:var(--text-muted)">${esc(t.type)}</small>
-                </td>
-                <td>${esc(getUserName(t.emp))}</td>
-                <td><code>${t.estHours ? t.estHours + 'h' : '—'}</code></td>
-                <td><span class="tag ${t.priority}">${t.priority}</span></td>
-                <td>
-                  <div style="display:flex;gap:4px;">
-                    ${t.status !== 'Completed' ? `<button class="btn success sm" onclick="markTaskDone('${t.id}')">✓ Done</button>` : ''}
-                    <button class="btn sec sm" onclick="taskModal('${t.id}')">Edit</button>
-                    ${state.session.role === 'Admin' ? `<button class="btn danger sm" onclick="deleteItem('tasks','${t.id}')">✕</button>` : ''}
-                  </div>
-                </td>
-              </tr>
-            `).join('') || '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No matching tasks found.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+    let l = db.tasks.filter(t => (f.ts === 'Open' ? t.status !== 'Completed' : f.ts === 'All' || t.status === f.ts) && (!f.tc || t.client === f.tc) && (!f.te || t.emp === f.te));
+    l.sort((a, b) => (a.due || '9').localeCompare(b.due || '9'));
+    return `<div class="bar">
+      <select onchange="f.ts=this.value;render()">${opt(['Open', 'Pending', 'In Progress', 'Completed', 'All'], f.ts)}</select>
+      <select onchange="f.tc=this.value;render()">${opt(cOpts(), f.tc, 'All clients')}</select>
+      <select onchange="f.te=this.value;render()">${opt(eOpts(), f.te, 'All employees')}</select>
+      <span class="sp"></span><button class="btn" onclick="taskForm()">+ New task</button>
+    </div>
+    <div class="panel">${taskRows(l)}</div>`;
   },
 
-  logs() {
-    let list = [...state.db.logs].sort((a,b) => b.date.localeCompare(a.date));
-    if (state.session.role === 'Staff') {
-      list = list.filter(l => l.emp === state.session.id);
-    }
-    const totalHours = list.reduce((a, b) => a + (+b.hours || 0), 0);
-
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <div>
-          <h2>Timesheet &amp; Daily Work Registry</h2>
-          <small style="color:var(--text-muted)">Total Logged Hours: <b>${totalHours.toFixed(2)}h</b></small>
-        </div>
-        <button class="btn" onclick="logModal()">+ Log Work Entry</button>
-      </div>
-
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Done By</th>
-              <th>Client</th>
-              <th>Work Carried Out</th>
-              <th>Hours</th>
-              <th>Billable</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${list.map(l => `
-              <tr>
-                <td><b>${fmtDate(l.date)}</b></td>
-                <td>${esc(getUserName(l.emp))}</td>
-                <td><b>${esc(getClientName(l.client))}</b></td>
-                <td>${esc(l.work)}</td>
-                <td><code>${(+l.hours || 0).toFixed(2)} hrs</code></td>
-                <td>${l.billable ? '<span class="tag Completed">Billable</span>' : '<span class="tag Low">Non-Billable</span>'}</td>
-                <td>
-                  ${(state.session.role === 'Admin' || l.emp === state.session.id) ? `
-                    <button class="btn sec sm" onclick="logModal('${l.id}')">Edit</button>
-                    <button class="btn danger sm" onclick="deleteItem('logs','${l.id}')">✕</button>
-                  ` : '—'}
-                </td>
-              </tr>
-            `).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No work logged yet.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  log() {
+    let l = db.logs.filter(x => (!f.ld || x.date === f.ld) && (!f.le || x.emp === f.le) && (!f.lc || x.client === f.lc)).sort((a, b) => b.date.localeCompare(a.date));
+    const h = l.reduce((a, x) => a + (+x.hours || 0), 0);
+    return `<div class="bar">
+      <input type="date" value="${f.ld}" onchange="f.ld=this.value;render()">
+      <button class="btn g s" onclick="f.ld='';render()">All dates</button>
+      <select onchange="f.lc=this.value;render()">${opt(cOpts(), f.lc, 'All clients')}</select>
+      <select onchange="f.le=this.value;render()">${opt(eOpts(), f.le, 'All employees')}</select>
+      <span class="sp"></span><button class="btn" onclick="logForm()">+ Add work done</button>
+    </div>
+    <div class="panel">${l.length ? `<div class="mut" style="margin-bottom:8px">${l.length} entries · ${h.toFixed(1)} hours</div><div class="tw"><table><tr><th>Date</th><th>Client</th><th>Work done</th><th>Done by</th><th>Hrs</th><th></th></tr>${l.map(x => `<tr><td>${fmt(x.date)}</td><td>${esc(cn(x.client))}</td><td>${esc(x.work)}</td><td>${esc(en(x.emp))}</td><td>${esc(x.hours || '')}</td><td style="white-space:nowrap"><button class="btn g s" onclick="logForm('${x.id}')">Edit</button> <button class="btn d s" onclick="del('logs','${x.id}')">✕</button></td></tr>`).join('')}</table></div>` : '<div class="empty">No work recorded for this selection.</div>'}</div>`;
   },
 
   clients() {
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <h2>Client Master Directory</h2>
-        ${state.session.role !== 'Staff' ? `<button class="btn" onclick="clientModal()">+ Register Client</button>` : ''}
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Client Name</th>
-              <th>Entity Type</th>
-              <th>PAN Number</th>
-              <th>GSTIN</th>
-              <th>Contact Details</th>
-              <th>Pending Tasks</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${state.db.clients.map(c => {
-              const pending = state.db.tasks.filter(t => t.client === c.id && t.status !== 'Completed').length;
-              return `
-              <tr>
-                <td><b>${esc(c.name)}</b></td>
-                <td><span class="tag Low">${esc(c.type || 'Company')}</span></td>
-                <td><code>${esc(c.pan || '—')}</code></td>
-                <td><code>${esc(c.gstin || '—')}</code></td>
-                <td>${esc(c.phone || '')}<br><small style="color:var(--text-muted)">${esc(c.email || '')}</small></td>
-                <td><span class="tag ${pending > 0 ? 'High' : 'Completed'}">${pending} Pending</span></td>
-                <td>
-                  <div style="display:flex;gap:4px;">
-                    <button class="btn sec sm" onclick="clientModal('${c.id}')">Edit</button>
-                    ${state.session.role === 'Admin' ? `<button class="btn danger sm" onclick="deleteItem('clients','${c.id}')">✕</button>` : ''}
-                  </div>
-                </td>
-              </tr>`;
-            }).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No clients added yet.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+    return `<div class="bar"><span class="sp"></span><button class="btn" onclick="clientForm()">+ New client</button></div>
+    <div class="panel">${db.clients.length ? `<div class="tw"><table><tr><th>Client</th><th>Type</th><th>PAN</th><th>GSTIN</th><th>Contact</th><th>Pending</th><th></th></tr>${db.clients.map(c => `<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.type || '')}</td><td><code>${esc(c.pan || '')}</code></td><td><code>${esc(c.gstin || '')}</code></td><td>${esc(c.phone || '')}</td><td>${db.tasks.filter(t => t.client === c.id && t.status !== 'Completed').length}</td><td style="white-space:nowrap"><button class="btn s" onclick="clientView('${c.id}')">Open</button> <button class="btn g s" onclick="clientForm('${c.id}')">Edit</button> <button class="btn d s" onclick="del('clients','${c.id}','Delete this client and all its records?')">✕</button></td></tr>`).join('')}</table></div>` : '<div class="empty">No clients yet.</div>'}</div>`;
   },
 
-  compliances() {
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <h2>Statutory Compliance Tracker</h2>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Statutory Act / Return</th>
-              <th>Category</th>
-              <th>Period</th>
-              <th>Statutory Due Date</th>
-              <th>Late Filing Consequences</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${state.db.compliances.sort((a,b) => a.due.localeCompare(b.due)).map(c => `
-              <tr style="${c.due < todayStr() ? 'background:var(--danger-bg);' : ''}">
-                <td><b>${esc(c.title)}</b></td>
-                <td><span class="tag Low">${esc(c.cat)}</span></td>
-                <td>${esc(c.period)}</td>
-                <td><b>${fmtDate(c.due)}</b>${c.due < todayStr() ? ' <span class="tag Overdue">Past Due</span>' : ''}</td>
-                <td><span style="color:var(--danger)">${esc(c.penalty)}</span></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  team() {
+    return `<div class="bar"><span class="sp"></span><button class="btn" onclick="empForm()">+ Add team member</button></div>
+    <div class="panel">${db.emps.length ? `<div class="tw"><table><tr><th>Name</th><th>Role</th><th>Pending</th><th>Total entries</th><th></th></tr>${db.emps.map(e => `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role || '')}</td><td>${db.tasks.filter(t => t.emp === e.id && t.status !== 'Completed').length}</td><td>${db.logs.filter(l => l.emp === e.id).length}</td><td><button class="btn d s" onclick="del('emps','${e.id}','Remove this team member?')">✕</button></td></tr>`).join('')}</table></div>` : '<div class="empty">Add the people who do the work.</div>'}</div>`;
   },
 
-  security() {
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <div>
-          <h2>🔐 Multi-ID Access &amp; Password Management</h2>
-          <small style="color:var(--text-muted)">Synced live with Neon PostgreSQL database</small>
-        </div>
-        <button class="btn" onclick="userModal()">+ Create User ID</button>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Full Name</th>
-              <th>Security Role</th>
-              <th>Associated Email / Client</th>
-              <th>Password State</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${state.db.users.map(u => `
-              <tr>
-                <td><code>@${esc(u.username)}</code></td>
-                <td><b>${esc(u.name)}</b></td>
-                <td><span class="tag ${u.role === 'Admin' ? 'High' : u.role === 'Manager' ? 'Medium' : 'Low'}">${u.role}</span></td>
-                <td>${u.role === 'Client' ? `Linked Client: <b>${esc(getClientName(u.client_id || u.clientId))}</b>` : esc(u.email || '—')}</td>
-                <td><span class="tag Completed">SHA-256 Encrypted</span></td>
-                <td>
-                  <button class="btn sec sm" onclick="resetUserPasswordModal('${u.id}')">Reset Password</button>
-                  ${u.id !== state.session.id ? `<button class="btn danger sm" onclick="deleteItem('users','${u.id}')">✕</button>` : ''}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-  },
-
-  backup() {
-    const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.db, null, 2));
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <h2>💾 Cloud Sync &amp; Database Backups</h2>
-      </div>
-      <p style="color:var(--text-muted);margin-bottom:20px;">
-        All actions automatically write directly to Neon PostgreSQL. You can also download local snapshots anytime.
-      </p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
-        <a class="btn" href="${jsonStr}" download="YMC_ERP_Backup_${todayStr()}.json">📥 Download Database Snapshot</a>
-        <button class="btn sec" onclick="syncNeonData()">🔄 Force Refresh From Neon</button>
-      </div>
-    </div>`;
-  },
-
-  client_portal() {
-    const cId = state.session.clientId;
-    const client = state.db.clients.find(c => c.id === cId) || {};
-    const tasks = state.db.tasks.filter(t => t.client === cId);
-    return `
-    <div class="card">
-      <div class="card-hdr">
-        <div>
-          <h2>Client Compliance Portal: ${esc(client.name)}</h2>
-          <small style="color:var(--text-muted)">PAN: ${esc(client.pan || 'N/A')} &bull; GSTIN: ${esc(client.gstin || 'N/A')}</small>
-        </div>
-      </div>
-      <div class="kpi-row">
-        <div class="kpi info">
-          <div class="num">${tasks.filter(t => t.status !== 'Completed').length}</div>
-          <div class="lbl">In Progress / Pending Filings</div>
-        </div>
-        <div class="kpi good">
-          <div class="num">${tasks.filter(t => t.status === 'Completed').length}</div>
-          <div class="lbl">Completed Compliances</div>
-        </div>
-      </div>
-      <h3 style="margin:20px 0 10px;">Filing Status &amp; Deliverables</h3>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Work Item</th>
-              <th>Category</th>
-              <th>Due Date</th>
-              <th>Current Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tasks.map(t => `
-              <tr>
-                <td><b>${esc(t.title)}</b></td>
-                <td>${esc(t.type)}</td>
-                <td>${fmtDate(t.due)}</td>
-                <td><span class="tag ${t.status.replace(/\s+/g,'')}">${t.status}</span></td>
-              </tr>
-            `).join('') || '<tr><td colspan="4" style="text-align:center;padding:20px;">No current engagements registered.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-  },
-
-  profile() {
-    return `
-    <div class="auth-box" style="margin:20px auto;">
-      <h2>User Profile &amp; Credentials</h2>
-      <p>Signed in as <b>@${esc(state.session.username)}</b> (${esc(state.session.role)})</p>
-      <form onsubmit="event.preventDefault(); changePassword(this.curPass.value, this.newPass.value);">
-        <div class="field-grp">
-          <label>Display Name</label>
-          <input type="text" value="${esc(state.session.name)}" disabled>
-        </div>
-        <div class="field-grp">
-          <label>Current Password</label>
-          <input type="password" name="curPass" required placeholder="Verify current password">
-        </div>
-        <div class="field-grp">
-          <label>New Password</label>
-          <input type="password" name="newPass" required placeholder="Minimum 4 characters">
-        </div>
-        <button type="submit" class="btn" style="width:100%;justify-content:center;">Update Password</button>
-      </form>
-    </div>`;
+  users() {
+    return `<div class="bar">
+      <span class="mut" style="font-size:13px;">Manage IDs and passwords (synced directly with Neon PostgreSQL)</span>
+      <span class="sp"></span>
+      <button class="btn" onclick="userForm()">+ Add User ID &amp; Password</button>
+    </div>
+    <div class="panel">${db.users.length ? `<div class="tw"><table><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Password</th><th></th></tr>${db.users.map(u => `<tr><td><b>@${esc(u.username)}</b></td><td>${esc(u.name)}</td><td><span class="b ${u.role === 'Admin' ? 'High' : 'Medium'}">${esc(u.role)}</span></td><td><span class="mut">Encrypted</span></td><td style="white-space:nowrap"><button class="btn g s" onclick="resetUserPass('${u.id}')">Change Password</button> ${u.id !== (currentUser ? currentUser.id : '') ? `<button class="btn d s" onclick="del('users','${u.id}','Delete this user ID?')">✕</button>` : ''}</td></tr>`).join('')}</table></div>` : '<div class="empty">No users configured.</div>'}</div>`;
   }
 };
 
-/* -------------------------------------------------------------
-   MODALS & CRUD DISPATCHERS
-------------------------------------------------------------- */
-function closeModal() {
-  document.getElementById('modalContainer').innerHTML = '';
-}
-
-function taskModal(id) {
-  const t = id ? state.db.tasks.find(x => x.id === id) : null;
-  const WT = ['GST Return', 'Income Tax Return', 'TDS/TCS', 'Audit', 'ROC/MCA Filing', 'Bookkeeping', 'Accounting', 'Notice/Appeal', 'Payroll/PF/ESI', 'Other'];
-  
-  document.getElementById('modalContainer').innerHTML = `
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-hdr">
-        <h3>${t ? 'Edit Task Assignment' : 'Create New Client Task'}</h3>
-        <button class="btn sec sm" onclick="closeModal()">✕</button>
-      </div>
-      <form onsubmit="event.preventDefault(); saveTask('${id || ''}', this);">
-        <div class="field-grp">
-          <label>Client</label>
-          <select name="client" required>
-            ${state.db.clients.map(c => `<option value="${c.id}" ${t&&t.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field-grp">
-          <label>Compliance / Work Type</label>
-          <select name="type">
-            ${WT.map(w => `<option value="${w}" ${t&&t.type===w?'selected':''}>${w}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field-grp">
-          <label>Task Description &amp; Scope</label>
-          <input type="text" name="title" required value="${esc(t ? t.title : '')}" placeholder="e.g. Oct 2026 GSTR-3B Reconciliation">
-        </div>
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>Assigned Staff</label>
-            <select name="emp" required>
-              ${state.db.users.filter(u=>u.role!=='Client').map(u => `<option value="${u.id}" ${t&&t.emp===u.id?'selected':''}>${esc(u.name)} (${u.role})</option>`).join('')}
-            </select>
-          </div>
-          <div class="field-grp">
-            <label>Due Date</label>
-            <input type="date" name="due" value="${t ? t.due : todayStr()}">
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>Priority</label>
-            <select name="priority">
-              <option value="High" ${t&&t.priority==='High'?'selected':''}>High</option>
-              <option value="Medium" ${!t||t.priority==='Medium'?'selected':''}>Medium</option>
-              <option value="Low" ${t&&t.priority==='Low'?'selected':''}>Low</option>
-            </select>
-          </div>
-          <div class="field-grp">
-            <label>Status</label>
-            <select name="status">
-              <option value="Pending" ${t&&t.status==='Pending'?'selected':''}>Pending</option>
-              <option value="In Progress" ${t&&t.status==='In Progress'?'selected':''}>In Progress</option>
-              <option value="Completed" ${t&&t.status==='Completed'?'selected':''}>Completed</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn sec" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Save to Neon Cloud</button>
-        </div>
-      </form>
-    </div>
-  </div>`;
-}
-
-function saveTask(id, form) {
-  const data = {
-    id: id || uid(),
-    client: form.client.value,
-    type: form.type.value,
-    title: form.title.value.trim(),
-    emp: form.emp.value,
-    due: form.due.value,
-    priority: form.priority.value,
-    status: form.status.value,
-    estHours: 5,
-    billable: true
-  };
-  if (id) {
-    const idx = state.db.tasks.findIndex(x => x.id === id);
-    if (idx !== -1) state.db.tasks[idx] = Object.assign(state.db.tasks[idx], data);
-  } else {
-    state.db.tasks.push(data);
-  }
-  saveLocalAndCloud('insert', 'tasks', data);
-  closeModal();
-  render();
-}
-
-function markTaskDone(id) {
-  const t = state.db.tasks.find(x => x.id === id);
-  if (!t) return;
-  const hours = prompt('Hours spent on this task:', '2');
-  t.status = 'Completed';
-  t.completedOn = todayStr();
-  t.completedBy = state.session.id;
-
-  const logData = {
-    id: uid(),
-    date: todayStr(),
-    client: t.client,
-    emp: state.session.id,
-    work: `Completed: ${t.type} - ${t.title}`,
-    hours: parseFloat(hours) || 1,
-    billable: true
-  };
-  state.db.logs.push(logData);
-
-  saveLocalAndCloud('update_task_done', 'tasks', { completedOn: t.completedOn, completedBy: t.completedBy }, id);
-  saveLocalAndCloud('insert', 'logs', logData);
-  render();
-}
-
-function logModal(id) {
-  const l = id ? state.db.logs.find(x => x.id === id) : null;
-  document.getElementById('modalContainer').innerHTML = `
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-hdr">
-        <h3>${l ? 'Edit Work Log' : 'Add Daily Timesheet Record'}</h3>
-        <button class="btn sec sm" onclick="closeModal()">✕</button>
-      </div>
-      <form onsubmit="event.preventDefault(); saveLog('${id||''}', this);">
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>Date</label>
-            <input type="date" name="date" required value="${l ? l.date : todayStr()}">
-          </div>
-          <div class="field-grp">
-            <label>Hours Spent</label>
-            <input type="number" step="0.25" min="0.25" name="hours" required value="${l ? l.hours : '1.0'}">
-          </div>
-        </div>
-        <div class="field-grp">
-          <label>Client</label>
-          <select name="client" required>
-            ${state.db.clients.map(c => `<option value="${c.id}" ${l&&l.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field-grp">
-          <label>Work Carried Out / Remarks</label>
-          <textarea name="work" rows="3" required placeholder="Describe specific sections, returns, vouchers verified...">${esc(l ? l.work : '')}</textarea>
-        </div>
-        <div class="field-grp">
-          <label>
-            <input type="checkbox" name="billable" ${!l || l.billable ? 'checked' : ''}> Billable Activity
-          </label>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn sec" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Log Time</button>
-        </div>
-      </form>
-    </div>
-  </div>`;
-}
-
-function saveLog(id, form) {
-  const data = {
-    id: id || uid(),
-    date: form.date.value,
-    hours: parseFloat(form.hours.value) || 0,
-    client: form.client.value,
-    emp: state.session.id,
-    work: form.work.value.trim(),
-    billable: form.billable.checked
-  };
-  if (id) {
-    const idx = state.db.logs.findIndex(x => x.id === id);
-    if (idx !== -1) state.db.logs[idx] = Object.assign(state.db.logs[idx], data);
-  } else {
-    state.db.logs.push(data);
-  }
-  saveLocalAndCloud('insert', 'logs', data);
-  closeModal();
-  render();
-}
-
-function clientModal(id) {
-  const c = id ? state.db.clients.find(x => x.id === id) : null;
-  document.getElementById('modalContainer').innerHTML = `
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-hdr">
-        <h3>${c ? 'Edit Client Details' : 'Register New Client'}</h3>
-        <button class="btn sec sm" onclick="closeModal()">✕</button>
-      </div>
-      <form onsubmit="event.preventDefault(); saveClient('${id||''}', this);">
-        <div class="field-grp">
-          <label>Client Entity Name</label>
-          <input type="text" name="name" required value="${esc(c ? c.name : '')}" placeholder="e.g. Acme Industrial Solutions Pvt Ltd">
-        </div>
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>Constitution</label>
-            <select name="type">
-              <option value="Company" ${c&&c.type==='Company'?'selected':''}>Company</option>
-              <option value="Partnership/LLP" ${c&&c.type==='Partnership/LLP'?'selected':''}>Partnership / LLP</option>
-              <option value="Individual" ${c&&c.type==='Individual'?'selected':''}>Individual</option>
-            </select>
-          </div>
-          <div class="field-grp">
-            <label>Hourly Rate (₹)</label>
-            <input type="number" name="rate" value="${c ? c.billing_rate || 1500 : 1500}">
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>PAN Number</label>
-            <input type="text" name="pan" value="${esc(c ? c.pan : '')}" placeholder="ABCDE1234F">
-          </div>
-          <div class="field-grp">
-            <label>GSTIN</label>
-            <input type="text" name="gstin" value="${esc(c ? c.gstin : '')}" placeholder="27ABCDE1234F1Z5">
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="field-grp">
-            <label>Phone / WhatsApp</label>
-            <input type="text" name="phone" value="${esc(c ? c.phone : '')}">
-          </div>
-          <div class="field-grp">
-            <label>Official Email</label>
-            <input type="email" name="email" value="${esc(c ? c.email : '')}">
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn sec" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Save Client</button>
-        </div>
-      </form>
-    </div>
-  </div>`;
-}
-
-function saveClient(id, form) {
-  const data = {
-    id: id || uid(),
-    name: form.name.value.trim(),
-    type: form.type.value,
-    billingRate: parseFloat(form.rate.value) || 1500,
-    pan: form.pan.value.trim().toUpperCase(),
-    gstin: form.gstin.value.trim().toUpperCase(),
-    phone: form.phone.value.trim(),
-    email: form.email.value.trim()
-  };
-  if (id) {
-    const idx = state.db.clients.findIndex(x => x.id === id);
-    if (idx !== -1) state.db.clients[idx] = Object.assign(state.db.clients[idx], data);
-  } else {
-    state.db.clients.push(data);
-  }
-  saveLocalAndCloud('insert', 'clients', data);
-  closeModal();
-  render();
-}
-
-function userModal() {
-  document.getElementById('modalContainer').innerHTML = `
-  <div class="modal-overlay">
-    <div class="modal">
-      <div class="modal-hdr">
-        <h3>Create New Multi-ID User Access</h3>
-        <button class="btn sec sm" onclick="closeModal()">✕</button>
-      </div>
-      <form onsubmit="event.preventDefault(); createUser(this);">
-        <div class="field-grp">
-          <label>Login Username</label>
-          <input type="text" name="un" required placeholder="e.g. pooja" autocomplete="off">
-        </div>
-        <div class="field-grp">
-          <label>Full Name</label>
-          <input type="text" name="name" required placeholder="e.g. Pooja Iyer">
-        </div>
-        <div class="field-grp">
-          <label>Role</label>
-          <select name="role" id="newUserRole">
-            <option value="Staff">Staff / Article Assistant</option>
-            <option value="Manager">Manager / Senior</option>
-            <option value="Admin">Partner / Admin</option>
-            <option value="Client">Client Representative</option>
-          </select>
-        </div>
-        <div class="field-grp">
-          <label>Password</label>
-          <input type="password" name="pw" required placeholder="••••••••">
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn sec" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn">Create Account</button>
-        </div>
-      </form>
-    </div>
-  </div>`;
-}
-
-async function createUser(form) {
-  const un = form.un.value.trim().toLowerCase();
-  if (state.db.users.some(u => u.username.toLowerCase() === un)) {
-    alert('Username already exists!');
-    return;
-  }
-  const hash = await sha256(form.pw.value);
-  const data = {
-    id: uid(),
-    username: un,
-    name: form.name.value.trim(),
-    role: form.role.value,
-    password_hash: hash,
-    email: '',
-    client_id: null
-  };
-  state.db.users.push(data);
-  saveLocalAndCloud('insert', 'users', data);
-  closeModal();
-  render();
-}
-
-async function resetUserPasswordModal(userId) {
-  const u = state.db.users.find(x => x.id === userId);
-  const newPass = prompt(`Enter new password for @${u.username}:`);
-  if (!newPass) return;
-  u.password_hash = await sha256(newPass);
-  saveLocalAndCloud('insert', 'users', u);
-  alert(`Password for @${u.username} updated!`);
-}
-
-async function changePassword(curPass, newPass) {
-  const curHash = await sha256(curPass);
-  const u = state.db.users.find(x => x.id === state.session.id);
-  if (!u || (u.password_hash !== curHash && u.passHash !== curHash)) {
-    alert('Current password incorrect!');
-    return;
-  }
-  u.password_hash = await sha256(newPass);
-  saveLocalAndCloud('insert', 'users', u);
-  alert('Password updated successfully!');
-}
-
-function deleteItem(tbl, id) {
-  if (!confirm('Are you sure you want to delete this record from the database?')) return;
-  state.db[tbl] = state.db[tbl].filter(x => x.id !== id);
-  saveLocalAndCloud('delete', tbl, null, id);
-  render();
-}
-
-/* -------------------------------------------------------------
-   RENDER LOOP
-------------------------------------------------------------- */
 function render() {
-  const topNavUser = document.getElementById('topNavUser');
-  const nav = document.getElementById('mainNav');
-  const app = document.getElementById('appView');
+  const hdrUser = document.getElementById('hdrUser');
+  const nav = document.getElementById('nav');
+  const v = document.getElementById('v');
 
-  if (!state.session) {
-    topNavUser.innerHTML = '';
+  if (!currentUser) {
+    hdrUser.innerHTML = '';
     nav.innerHTML = '';
-    app.innerHTML = Views.login();
+    v.innerHTML = V.login();
     return;
   }
 
-  topNavUser.innerHTML = `
-    <div class="user-pill">
-      <div class="user-avatar">${state.session.name.charAt(0)}</div>
-      <div>
-        <b>${esc(state.session.name)}</b>
-        <span style="opacity:0.7;font-size:11px;">(${state.session.role})</span>
-      </div>
+  hdrUser.innerHTML = `
+    <div class="hdr-user">
+      <b>${esc(currentUser.name)}</b> <span style="opacity:0.8;">(${esc(currentUser.role)})</span>
     </div>
-    <button class="btn sec sm" onclick="logoutUser()">Logout</button>
+    <button class="hdr-btn" onclick="logout()">Logout</button>
   `;
 
-  const tabs = getTabs();
-  nav.innerHTML = tabs.map(([k, lbl]) => `
-    <button class="${state.currentTab === k ? 'active' : ''}" onclick="state.currentTab='${k}';render();">
-      ${lbl}
-    </button>
-  `).join('');
-
-  const viewFn = Views[state.currentTab] || Views.dashboard;
-  app.innerHTML = viewFn();
+  nav.innerHTML = TABS.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="tab='${k}';render()">${l}</button>`).join('');
+  v.innerHTML = (V[tab] || V.dash)();
 }
 
-// Initial sync and render
-syncNeonData();
+const nav = document.getElementById('nav'), v = document.getElementById('v'), m = document.getElementById('m');
+syncWithNeon();
 render();
 </script>
 </body>
